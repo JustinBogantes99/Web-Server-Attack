@@ -2,13 +2,20 @@ use std::{sync::mpsc,thread};
 use std::sync::Arc;
 use std::sync::Mutex;
 
+/*
+Estructura para la creacion del hilo
+*/
 pub struct ThreadPool {
     workers: Vec<Worker>,
     sender: mpsc::Sender<Job>,
 }
-
+/*
+Estructura que tendra el job
+*/
 type Job = Box<dyn FnOnce() + Send + 'static>;
-
+/*
+Implementacion de los hilos
+*/
 impl ThreadPool {
     pub fn new(size: usize) -> ThreadPool {
         assert!(size > 0);
@@ -36,12 +43,16 @@ impl ThreadPool {
     }
     
 }
-
+/*
+Estructura con la cual el hilo es ejecutado utiliza el tamaño de este 
+*/
 struct Worker {
     id: usize,
     thread: thread::JoinHandle<()>,
 }
-
+/*
+Implementacion del worker el cual crea el hilo que se utiliza
+*/
 impl Worker {
     fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Job>>>) -> Worker {
         let thread = thread::spawn(move || loop {
